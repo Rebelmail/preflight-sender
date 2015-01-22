@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+
+var program = require('commander'),
+	sender = require('../index.js');
+
+program
+	.command('send <path>')
+	.description('Sends an email with the provided file as the HTML body')
+	.option('-t, --to <addy>', "Address to send emails to")
+	.option('-f, --from <addy>', "Address to send emails from")
+	.option('-s, --subject', "Subject of the Email")
+	.option('-v, --verbose', "Verbose")
+	.action(function(path, options){
+		sender.send(path,options, function(e,r){
+			if (e) throw new Error(e);
+			return console.log('Email Successfully sent to: ', options.to);
+		});
+	});
+
+program.parse(process.argv);
