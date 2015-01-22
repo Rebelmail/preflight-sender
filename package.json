@@ -1,6 +1,6 @@
 {
   "name": "preflight-sender",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Easy Command line tool for sending emails!",
   "main": "index.js",
   "scripts": {
