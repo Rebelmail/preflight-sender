@@ -29,17 +29,8 @@ var Sender = function(){
 	return this;
 };
 
-Sender.prototype.send = function(path, options, cb){
-
-	if (path){
-		try {
-			this.html = fs.readFileSync(path, {encoding: 'utf8'});
-		} catch (e){
-			this.html = path;
-		}
-	} else {
-		throw new Error("Missing File Path or HTML String argument");
-	};
+Sender.prototype.send = function(doc, options, cb){
+	this.html = doc;
 
 	var mailOptions = {
 	    from: options.from || "postmaster@engageinbox.mailgun.org",
