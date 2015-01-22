@@ -1,0 +1,23 @@
+{
+  "name": "preflight-sender",
+  "version": "0.0.1",
+  "description": "Easy Command line tool for sending emails!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin":{
+    "preflight-sender":"bin/preflight-sender"
+  },
+  "keywords": [
+    "email",
+    "html",
+    "css",
+    "nodemailer",
+    "sendgrid",
+    "mailgun",
+    "ses"
+  ],
+  "author": "Trever Faden (@trever)",
+  "license": "ISC"
+}
