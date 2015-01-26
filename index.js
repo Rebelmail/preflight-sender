@@ -1,31 +1,25 @@
 var nodemailer = require('nodemailer'),
 	Random = require('meteor-random');
 
-function checkEnv(){
-	if (!process || !process.env || !process.env.MAILGUN_USER || !process.env.MAILGUN_PASS || !process.env.MAILGUN_DOMAIN){
-		return false
-	} else {
-		return true
-	}
-};
 
-if (!checkEnv()){
-	var dotenv = require('dotenv');
-	dotenv._getKeysAndValuesFromEnvFilePath(__dirname + '/.env');
-	dotenv._setEnvs();
-	if (!checkEnv()) throw new Error('Missing required enviornment variables!');
-};
 
-var transporter = nodemailer.createTransport({
-   service: "Mailgun",
-   auth: {
-     user: process.env.MAILGUN_USER,
-     pass: process.env.MAILGUN_PASS,
-     domain:process.env.MAILGUN_DOMAIN
-   }
-});
+var transporter;
 
-var Sender = function(){
+var Sender = function(config){
+	if (!config.MAILGUN_USER) throw new Error('Missing MAILGUN_USER key');
+	if (!config.MAILGUN_PASS) throw new Error('Missing MAILGUN_PASS key');
+	if (!config.MAILGUN_DOMAIN) throw new Error('Missing MAILGUN_DOMAIN key');
+
+	transporter = nodemailer.createTransport({
+	   service: "Mailgun",
+	   auth: {
+	     user: config.MAILGUN_USER,
+	     pass: config.MAILGUN_PASS,
+	     domain: config.MAILGUN_DOMAIN
+	   }
+	});
+
+	this.config = config;
 	return this;
 };
 
@@ -48,4 +42,4 @@ Sender.prototype._throwError = function(error){
 	throw new Error(error);
 };
 
-module.exports = new Sender();
+module.exports = Sender;

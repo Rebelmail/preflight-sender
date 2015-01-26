@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var program = require('commander'),
-	sender = require('../index.js');
+	Sender = require('../index.js');
 
 program
 	.command('send <path>')
@@ -11,6 +11,24 @@ program
 	.option('-s, --subject', "Subject of the Email")
 	.option('-v, --verbose', "Verbose")
 	.action(function(path, options){
+		function checkEnv(){
+			if (!process || !process.env || !process.env.MAILGUN_USER || !process.env.MAILGUN_PASS || !process.env.MAILGUN_DOMAIN){
+				return false
+			} else {
+				return true
+			}
+		};
+
+		if (!checkEnv()){
+			var dotenv = require('dotenv');
+			dotenv._getKeysAndValuesFromEnvFilePath(__dirname + '/../.env');
+			dotenv._setEnvs();
+			if (!checkEnv()) throw new Error('Missing required enviornment variables!');
+		};
+		var file = fs.readFileSync(__dirname + "/../.env");
+		var config = dotenv.parse(file);
+		var sender = new Sender(config);
+
 		var doc;
 		if (path){
 			try {
