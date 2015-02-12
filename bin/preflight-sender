@@ -2,7 +2,7 @@
 require('dotenv').load();
 var program = require('commander');
 var	Sender = require('../index.js');
-
+var fs = require('fs');
 program
 .command('send <path>')
 .description('Sends an email with the provided file as the HTML body')
@@ -17,8 +17,8 @@ program
   var doc;
   if (path){
     try {
-      doc = fs.readFileSync(path, {encoding: 'utf8'});
-    } catch (e){
+      doc = fs.readFileSync(__dirname + '/' + path, {encoding: 'utf8'});
+    } catch (e) {
       doc = path;
     }
   } else {
@@ -29,7 +29,6 @@ program
   options.MAILGUN_PASS = process.env.MAILGUN_PASS;
   options.MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN;
   var sender = new Sender(options);
-  console.log(sender);
   sender.send(doc, function(e, r){
     if (e) return console.log(new Error(e));
     console.log('Email Successfully sent to: ', options.to);
