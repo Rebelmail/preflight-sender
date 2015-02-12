@@ -1,49 +1,39 @@
 #!/usr/bin/env node
-
-var program = require('commander'),
-	Sender = require('../index.js');
+require('dotenv').load();
+var program = require('commander');
+var	Sender = require('../index.js');
 
 program
-	.command('send <path>')
-	.description('Sends an email with the provided file as the HTML body')
-	.option('-t, --to <addy>', "Address to send emails to")
-	.option('-f, --from <addy>', "Address to send emails from")
-	.option('-s, --subject', "Subject of the Email")
-	.option('-v, --verbose', "Verbose")
-	.action(function(path, options){
-		function checkEnv(){
-			if (!process || !process.env || !process.env.MAILGUN_USER || !process.env.MAILGUN_PASS || !process.env.MAILGUN_DOMAIN){
-				return false
-			} else {
-				return true
-			}
-		};
+.command('send <path>')
+.description('Sends an email with the provided file as the HTML body')
+.option('-t, --to <addy>', "Address to send emails to")
+.option('-f, --from <addy>', "Address to send emails from")
+.option('-s, --subject', "Subject of the Email")
+.option('-v, --verbose', "Verbose")
+.action(function(path, options) {
+  if (!process.env.MAILGUN_USER || !process.env.MAILGUN_PASS || !process.env.MAILGUN_DOMAIN) {
+    return console.log(new Error('Missing credentials'));
+  }
+  var doc;
+  if (path){
+    try {
+      doc = fs.readFileSync(path, {encoding: 'utf8'});
+    } catch (e){
+      doc = path;
+    }
+  } else {
+    return console.log("Missing File Path or HTML String argument");
+  }
 
-		if (!checkEnv()){
-			var dotenv = require('dotenv');
-			dotenv._getKeysAndValuesFromEnvFilePath(__dirname + '/../.env');
-			dotenv._setEnvs();
-			if (!checkEnv()) throw new Error('Missing required enviornment variables!');
-		};
-		var file = fs.readFileSync(__dirname + "/../.env");
-		var config = dotenv.parse(file);
-		var sender = new Sender(config);
-
-		var doc;
-		if (path){
-			try {
-				doc = fs.readFileSync(path, {encoding: 'utf8'});
-			} catch (e){
-				doc = path;
-			}
-		} else {
-			return console.log("Missing File Path or HTML String argument");
-		};
-
-		sender.send(doc, options, function(e,r){
-			if (e) throw new Error(e);
-			return console.log('Email Successfully sent to: ', options.to);
-		});
-	});
+  options.MAILGUN_USER = process.env.MAILGUN_USER;
+  options.MAILGUN_PASS = process.env.MAILGUN_PASS;
+  options.MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN;
+  var sender = new Sender(options);
+  console.log(sender);
+  sender.send(doc, function(e, r){
+    if (e) return console.log(new Error(e));
+    console.log('Email Successfully sent to: ', options.to);
+  });
+});
 
 program.parse(process.argv);

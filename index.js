@@ -26,17 +26,17 @@ Sender.prototype.run = function(html, cb) {
 
 
 Sender.prototype.send = function(doc, cb) {
-  if (this.to) {
-    cb(new Error('missing destination emails'), null);
+  if (!this.config.to) {
+    return cb(new Error('missing destination emails'), null);
   }
   var mailOptions = {
-    from: this.from || "postmaster@engageinbox.mailgun.org",
-    bcc: this.to || this._throwError('Missing To Emails'),
+    from: this.config.from || "postmaster@engageinbox.mailgun.org",
+    bcc: this.config.to,
     subject: this.subject || Random.id(),
     html: doc
   };
   this.transporter.sendMail(mailOptions, function(err, info){
-    if (err) return cb(error, null);
+    if (err) return cb(err, null);
     return cb(null, doc);
   });
 };
